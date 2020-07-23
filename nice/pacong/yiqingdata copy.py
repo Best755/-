@@ -5,6 +5,7 @@ from datetime import datetime
 import time
 import random
 import numpy
+import re
 
 class downdata:
     def __init__(self):
@@ -79,8 +80,8 @@ class downdata:
             timedata1s = list(set(timedata1s+timedata1))
         timedata1s.sort()
         timedata2s = timedata1s[0:-7]
-        print(timedata2s)
-        #conn = pymysql.connect(host="localhost", user="root",password="root",database="lol",charset="utf8")
+        #print(timedata2s)
+        #conn = pymysql.connect(host="121.41.228.236", user="root",password="0000",database="nice",charset="utf8")
         #cursor = conn.cursor()
         #cursor.execute("DROP TABLE IF EXISTS foregin")
         #sql = """"""
@@ -103,30 +104,30 @@ class downdata:
             everydaydeath = dict(zip(timedata,death))
             everydayThe_new_diagnosis = dict(zip(timedata,The_new_diagnosis))
             #sumworld是国外每天的总数
-            for key,value in everydayconfirmed.items():
-                if key in sumworldconfirmed:
-                    sumworldconfirmed[key] += value
-                else:
-                    sumworldconfirmed[key] = value
-            for key,value in everydaycure.items():
-                if key in sumworldcure:
-                    sumworldcure[key] += value
-                else:
-                    sumworldcure[key] = value
-            for key,value in everydaydeath.items():
-                if key in sumworlddeath:
-                    sumworlddeath[key] += value
-                else:
-                    sumworlddeath[key] = value
-            for key,value in everydayThe_new_diagnosis.items():
-                if key in sumworldThe_new_diagnosis:
-                    sumworldThe_new_diagnosis[key] += value
-                else:
-                    sumworldThe_new_diagnosis[key] = value
-        print(sumworlddeath)
-        print(sumworldcure)
-        print(sumworldconfirmed)
-        print(sumworldThe_new_diagnosis)
+            #for key,value in everydayconfirmed.items():
+                #if key in sumworldconfirmed:
+                    #sumworldconfirmed[key] += value
+                #else:
+                    #sumworldconfirmed[key] = value
+            #for key,value in everydaycure.items():
+                #if key in sumworldcure:
+                    #sumworldcure[key] += value
+                #else:
+                    #sumworldcure[key] = value
+            #for key,value in everydaydeath.items():
+                #if key in sumworlddeath:
+                    #sumworlddeath[key] += value
+                #else:
+                    #sumworlddeath[key] = value
+            #for key,value in everydayThe_new_diagnosis.items():
+                #if key in sumworldThe_new_diagnosis:
+                    #sumworldThe_new_diagnosis[key] += value
+                #else:
+                    #sumworldThe_new_diagnosis[key] = value
+        #print(sumworlddeath)
+        #print(sumworldcure)
+        #print(sumworldconfirmed)
+        #print(sumworldThe_new_diagnosis)
         #cursor.close()
         #conn.close()
     def deal_with_chinacity(self,basedata):
@@ -154,15 +155,23 @@ class downdata:
             timedata1s = list(set(timedata1s+timedata1))
         timedata1s.sort()
         timedata2s = timedata1s[0:-7]
-        print(timedata2s)
-        #conn = pymysql.connect(host="localhost", user="root",password="root",database="lol",charset="utf8")
-        #cursor = conn.cursor()
-        #cursor.execute("DROP TABLE IF EXISTS chinacity")
-        #sql = """"""
+        #print(timedata2s)
+        conn = pymysql.connect(host="121.41.228.236", user="root",password="000000",database="nice",charset="utf8")
+        cursor = conn.cursor()
+        sql = "truncate table App_china;"
+        cursor.execute(sql)
+        conn.commit()
+        j = 0
+        idd = 0 
+        idds = []
         for each in range(len(r["data"])):
             name = r["data"][each]["name"]
             names.append(name)
             timedata = r["data"][each]["trend"]["updateDate"]
+            pname = []
+            for i in range(len(timedata)):
+                pname.append(name)
+
             timedatas = list(set(timedatas+timedata))
             confirmed = r["data"][each]["trend"]["list"][0]["data"]
             #sumchina = numpy.array(sumchina1)
@@ -181,32 +190,59 @@ class downdata:
             everydaydeath = dict(zip(timedata,death))
             everydayThe_new_diagnosis = dict(zip(timedata,The_new_diagnosis))
             #sumchina是全国每天的总数
-            for key,value in everydayconfirmed.items():
-                if key in sumchinaconfirmed:
-                    sumchinaconfirmed[key] += value
-                else:
-                    sumchinaconfirmed[key] = value
-            for key,value in everydaycure.items():
-                if key in sumchinacure:
-                    sumchinacure[key] += value
-                else:
-                    sumchinacure[key] = value
-            for key,value in everydaydeath.items():
-                if key in sumchinadeath:
-                    sumchinadeath[key] += value
-                else:
-                    sumchinadeath[key] = value
-            for key,value in everydayThe_new_diagnosis.items():
-                if key in sumchinaThe_new_diagnosis:
-                    sumchinaThe_new_diagnosis[key] += value
-                else:
-                    sumchinaThe_new_diagnosis[key] = value
-        print(sumchinadeath)
-        print(sumchinacure)
-        print(sumchinaconfirmed)
-        print(sumchinaThe_new_diagnosis)
-        #cursor.close()
-        #conn.close()
+            #for key,value in everydayconfirmed.items():
+               #if key in sumchinaconfirmed:
+                    #sumchinaconfirmed[key] += value
+                #else:
+                    #sumchinaconfirmed[key] = value
+            #for key,value in everydaycure.items():
+                #if key in sumchinacure:
+                    #sumchinacure[key] += value
+                #else:
+                    #sumchinacure[key] = value
+            #for key,value in everydaydeath.items():
+                #if key in sumchinadeath:
+                    #sumchinadeath[key] += value
+                #else:
+                    #sumchinadeath[key] = valuei
+            datestrs = []
+            for i in range(len(timedata)):
+                pattern = r'[.]'                      # 定义分隔符
+                url = str(timedata[i]) # 需要拆分的字符串
+                result = re.split(pattern, url) # 以pattern的值 分割字符串
+                tmds = "2020-"+result[0]+"-"+result[1]
+    # 字符串->time
+                #datestr = time.strptime(tmds, "%Y-%m-%d")
+                datestrs.append(tmds)
+            print(datestrs)
+            #for key,value in everydayThe_new_diagnosis.items():
+                #if key in sumchinaThe_new_diagnosis:
+                    #sumchinaThe_new_diagnosis[key] += value
+                #else:
+                    #sumchinaThe_new_diagnosis[key] = value
+            j=j+each
+            v = list(map(lambda x: x[0]-x[1], zip(confirmed, cure)))
+            now = list(map(lambda x: x[0]-x[1], zip(v, death)))
+            for i in range(len(timedata)):
+                j = j + i
+                idds.append(j)
+                sql2 = "INSERT INTO App_china(id,date,add_new,sum_definite,sum_suspected,sum_cure,sum_die,province_name) \
+                    VALUES (%s,str_to_date(\'%s\','%%Y-%%m-%%d'),%s , %s ,  %s,  %s,  %s ,' %s')"%(idds[i],datestrs[i],The_new_diagnosis[i],confirmed[i],now[i],cure[i],death[i],pname[i])
+    # 执行sql语句
+                cursor.execute(sql2)
+                conn.commit()
+                print("ok")
+    # 提交到数据库执行
+            #    except:
+    # Rollback in case there is any error
+            #       print("wrong")
+            #       conn.rollback()
+        #print(sumchinacure)
+        #print(sumchinaconfirmed)
+        #print(sumchinaThe_new_diagnosis)
+        cursor.close()
+        conn.close()
+        print("finish")
             
             
     def foreign_run(self):
@@ -223,5 +259,5 @@ def timer(n):
             yunxing.foreign_run()
             yunxing.chinacity_run()
             time.sleep(n)
-# 5s
-timer(120222)
+# 
+timer(43200)
