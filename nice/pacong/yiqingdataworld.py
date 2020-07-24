@@ -81,14 +81,22 @@ class downdata:
         timedata1s.sort()
         timedata2s = timedata1s[0:-7]
         #print(timedata2s)
-        #conn = pymysql.connect(host="121.41.228.236", user="root",password="0000",database="nice",charset="utf8")
-        #cursor = conn.cursor()
+        conn = pymysql.connect(host="121.41.228.236", user="root",password="0000",database="nice",charset="utf8")
+        cursor = conn.cursor()
+        sql = "truncate table App_word;"
+        cursor.execute(sql)
+        conn.commit()
         #cursor.execute("DROP TABLE IF EXISTS foregin")
         #sql = """"""
         for each1 in range(len(r["data"])):
+            print(each1)
             name = r["data"][each1]["name"]
             names.append(name)
             timedata = r["data"][each1]["trend"]["updateDate"]
+            pname = []
+            for i in range(len(timedata)):
+                pname.append(name)
+
             timedatas = list(set(timedatas+timedata))
             confirmed = r["data"][each1]["trend"]["list"][0]["data"]
             confirmeds.append(confirmed)
@@ -124,12 +132,43 @@ class downdata:
                     #sumworldThe_new_diagnosis[key] += value
                 #else:
                     #sumworldThe_new_diagnosis[key] = value
+            datestrs = []
+            for i in range(len(timedata)):
+                pattern = r'[.]'                      # 定义分隔符
+                url = str(timedata[i]) # 需要拆分的字符串
+                result = re.split(pattern, url) # 以pattern的值 分割字符串
+                tmds = "2020-"+result[0]+"-"+result[1]
+    # 字符串->time
+                #datestr = time.strptime(tmds, "%Y-%m-%d")
+                #datestr1 = str(time.strftime("%Y-%m-%d", datestr))
+                datestrs.append(tmds)
+            #print(datestrs)
+            v = list(map(lambda x: x[0]-x[1], zip(confirmed, cure)))
+            now = list(map(lambda x: x[0]-x[1], zip(v, death)))
+            try:
+                for i in range(len(timedata)):
+                    sql2 = "INSERT INTO App_word(date,word_name,add_new,sum_definite,sum_suspected,sum_cure,sum_die) \
+                        VALUES ('%s','%s' , %s ,  %s,  %s,  %s,%s)"\
+                            %(datestrs[i],pname[i],The_new_diagnosis[i],confirmed[i],now[i],cure[i],death[i])
+        # 执行sql语句
+                    try:
+                        cursor.execute(sql2)
+                        conn.commit()
+                        #print("ok")
+        # 提交到数据库执行
+                    except:
+        # Rollback in case there is any error
+                        print("wrong")
+                        conn.rollback()
+            except:
+                each1 = each1+1
         #print(sumworlddeath)
         #print(sumworldcure)
         #print(sumworldconfirmed)
         #print(sumworldThe_new_diagnosis)
-        #cursor.close()
-        #conn.close()
+        print("finshworld")
+        cursor.close()
+        conn.close()
     def deal_with_chinacity(self,basedata):
         r = json.loads(basedata)
         names = []
@@ -161,10 +200,8 @@ class downdata:
         sql = "truncate table App_china;"
         cursor.execute(sql)
         conn.commit()
-        j = 0
-        idd = 0 
-        idds = []
         for each in range(len(r["data"])):
+            print(each)
             name = r["data"][each]["name"]
             names.append(name)
             timedata = r["data"][each]["trend"]["updateDate"]
@@ -213,36 +250,39 @@ class downdata:
                 tmds = "2020-"+result[0]+"-"+result[1]
     # 字符串->time
                 #datestr = time.strptime(tmds, "%Y-%m-%d")
+                #datestr1 = str(time.strftime("%Y-%m-%d", datestr))
                 datestrs.append(tmds)
-            print(datestrs)
+            #print(datestrs)
             #for key,value in everydayThe_new_diagnosis.items():
                 #if key in sumchinaThe_new_diagnosis:
                     #sumchinaThe_new_diagnosis[key] += value
                 #else:
                     #sumchinaThe_new_diagnosis[key] = value
-            j=j+each
             v = list(map(lambda x: x[0]-x[1], zip(confirmed, cure)))
             now = list(map(lambda x: x[0]-x[1], zip(v, death)))
-            for i in range(len(timedata)):
-                j = j + i
-                idds.append(j)
-                sql2 = "INSERT INTO App_china(id,date,add_new,sum_definite,sum_suspected,sum_cure,sum_die,province_name) \
-                    VALUES (%s,str_to_date(\'%s\','%%Y-%%m-%%d'),%s , %s ,  %s,  %s,  %s ,' %s')"%(idds[i],datestrs[i],The_new_diagnosis[i],confirmed[i],now[i],cure[i],death[i],pname[i])
-    # 执行sql语句
-                cursor.execute(sql2)
-                conn.commit()
-                print("ok")
-    # 提交到数据库执行
-            #    except:
-    # Rollback in case there is any error
-            #       print("wrong")
-            #       conn.rollback()
+            try:
+                for i in range(len(The_new_diagnosis)):
+                    sql2 = "INSERT INTO App_china(date,province_name,add_new,sum_definite,sum_suspected,sum_cure,sum_die) \
+                        VALUES ('%s','%s' , %s ,  %s,  %s,  %s,%s)"\
+                        %(datestrs[i],pname[i],The_new_diagnosis[i],confirmed[i],now[i],cure[i],death[i])
+        # 执行sql语句
+                    try:
+                        cursor.execute(sql2)
+                        conn.commit()
+                        #print("ok")
+        # 提交到数据库执行
+                    except:
+            # Rollback in case there is any error
+                        print("wrong")
+                        conn.rollback()
+            except:
+                each = each+1
         #print(sumchinacure)
         #print(sumchinaconfirmed)
         #print(sumchinaThe_new_diagnosis)
         cursor.close()
         conn.close()
-        print("finish")
+        print("finishchina")
             
             
     def foreign_run(self):
@@ -256,7 +296,7 @@ localtime = time.localtime(time.time())
 def timer(n):
     while True:
             yunxing = downdata()
-            yunxing.foreign_run()
+            #yunxing.foreign_run()
             yunxing.chinacity_run()
             time.sleep(n)
 # 
