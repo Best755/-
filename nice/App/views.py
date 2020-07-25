@@ -16,8 +16,12 @@ def index(request):
             data={}
             date = item.date
             sum_definite = item.sum_definite
+            sum_die = item.sum_die
+            sum_cure = item.sum_cure
             data["date"] = date
             data["sum_definite"] = sum_definite
+            data["sum_cure"] = sum_cure
+            data["sum_die"] = sum_die
             s.append(data)
         dist["data"]=s
         return JsonResponse(data=dist)
@@ -53,10 +57,14 @@ def word_data(request):
             date = item.date
             word_name = item.word_name
             sum_definite = item.sum_definite
+            sum_die = item.sum_die
+            sum_cure = item.sum_cure
             # province_name = item.province_name
             data["date"] = date
             data["sum_definite"] = sum_definite
             data["word_name"] = word_name
+            data["sum_die"] = sum_die
+            data["sum_cure"] = sum_cure
             # data["province_name"] = province_name
             s.append(data)
         dist["data"] = s
