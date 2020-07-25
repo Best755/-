@@ -1,7 +1,5 @@
 from django.db import models
 
-
-# Create your models here.
 class china(models.Model):
     date = models.DateField(u'时间')
     province_name = models.CharField(u'省份名称', max_length=255, default="")
