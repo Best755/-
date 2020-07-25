@@ -284,20 +284,15 @@ class downdata:
         conn.close()
         print("finishchina")
             
-            
-    def foreign_run(self):
-        base_data1 = self.get_url(self.url1)
-        dealwith = self.deal_with_foreign(base_data1)
+    #国外历史数据      
+    #def foreign_run(self):
+        #base_data1 = self.get_url(self.url1)
+        #dealwith = self.deal_with_foreign(base_data1)
+    #中国历史数据    
     def chinacity_run(self):
         base_data2 = self.get_url(self.url2)
         dealwith1 = self.deal_with_chinacity(base_data2)
 
-localtime = time.localtime(time.time())
-def timer(n):
-    while True:
-            yunxing = downdata()
-            #yunxing.foreign_run()
-            yunxing.chinacity_run()
-            time.sleep(n)
-# 
-timer(43200)
+
+yunxing = downdata()
+yunxing.chinacity_run()
