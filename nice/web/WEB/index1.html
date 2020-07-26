@@ -43,9 +43,19 @@
 
 
         }
+        .tb{
+            width: 200px;
+
+        }
+        .tc{
+            width: 100px;
+            background-color: #2C58A6;
+            color: #FFFFFF;
+
+        }
     </style>
 </head>
-<body  style="overflow:hidden">
+<body >
 
 <!--header-->
 <div class="header">
@@ -58,6 +68,13 @@
 
 <!--main-->
 <div class="data_content">
+     <div class="data_time">
+
+             <input name="mycontent" id="mycontentid" type="text" value="" class="tb"/>
+             <input type="button" name="getvalue" id="cli" value="搜索" onclick="fungetvalue()" class="tc"/>
+
+
+    </div>
 
     <div class="data_main">
         <div class="main_left fl">
@@ -204,6 +221,7 @@
                      <table id="tr" class="table">
                         <thead>
                         <tr>
+                            <th>国家</th>
                             <th>时间</th>
                             <th>确诊人数</th>
                             <th>死亡人数</th>
@@ -221,10 +239,19 @@
 </body>
 <script src="js/jquery-2.2.1.min.js" type="text/javascript"></script>
  <script type="text/javascript">
-$(document).ready(
-    function() {
+      function fungetvalue() {
+          var input_value = document.getElementById("mycontentid").value ;
+          console.log(input_value)
+        // alert("获取值：");
+        // var nationName=document.getElementById("f1").value;
+        var url = "";
+        if(input_value){
+            url="http://121.41.228.236:8000/app/es_s/?name="+input_value;
+        }else {
+            url="http://121.41.228.236:8000/app/es_s/";
+        }
               $.ajax({
-                  url : "http://121.41.228.236:8000/app/index/",//后台请求的数据
+                  url : url,//后台请求的数据
                   dataType: 'json', //数据格式
                   type : "get",//请求方式
                   async : true,//是否异步请求
@@ -235,11 +262,13 @@ $(document).ready(
 
                       for (var i = 0; i < tt.length; i++) {   //遍历
                           str1 += "<tr cate-id='0' fid='0'>" +
+                              "<td>" + tt[i].name+ "</td>" +
+
                               "<td>" + tt[i].date+ "</td>" +    //i代表下标，获取数据中的下标为i的1的值
                               "<td>" + tt[i].sum_definite +"</td>" +    //i代表下标，获取数据中的下标为i的2的值
-                              "<td>" + tt[i].sum_cure +"</td>" +    //i代表下标，获取数据中的下标为i的3的值
+                              "<td>" + tt[i].sum_die+"</td>" +    //i代表下标，获取数据中的下标为i的3的值
                               //.....
-                              "<td>" + tt[i].sum_die +"</td>";    //i代表下标，获取数据中的下标为i的n的值，1-n是属性名
+                              "<td>" + tt[i].sum_cure +"</td>";    //i代表下标，获取数据中的下标为i的n的值，1-n是属性名
                       }
                       test.innerHTML = str1;   //将数据写入html中
                   },
@@ -249,6 +278,8 @@ $(document).ready(
                   }
               })
           }
+$(document).ready(
+
           )
     </script>
 
