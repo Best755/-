@@ -19,6 +19,14 @@ class word(models.Model):
     sum_cure = models.IntegerField(u'总共治愈人数', default=0)
     sum_die = models.IntegerField(u'总共死亡人数', default=0)
 
+class china_if(models.Model):
+    date = models.DateField(u'时间')
+    add_new = models.IntegerField(u'新增确诊人数', default=0)
+    sum_definite = models.IntegerField(u'总共确诊人数', default=0)
+    sum_suspected = models.IntegerField(u'现有确诊人数', default=0)
+    sum_cure = models.IntegerField(u'总共治愈人数', default=0)
+    sum_die = models.IntegerField(u'总共死亡人数', default=0)
+
 
 # class guizhou(models.Model):
 #     date = models.DateField(u'时间')
