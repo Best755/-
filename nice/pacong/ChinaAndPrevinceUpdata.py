@@ -104,7 +104,7 @@ for contry in datas['areaTree']:
                 #cure.append(city['total']['heal'])
                 #summ.append(city['total']['confirm'])
                 #插入province表
-                if  str(city['name'])=="地区待确认":
+                if  str(city['name']) == "地区待确认":
                     continue
                 
                 sql2 = "INSERT INTO App_province(date,add_new,sum_definite,sum_suspected,sum_cure,sum_die,province_name,city_name) \
@@ -113,13 +113,45 @@ for contry in datas['areaTree']:
                                 city['total']['heal'],city['total']['dead'],province['name'],str(city['name']))
                 cursor.execute(sql2)
                 conn.commit()
+            
             #插入china表
-            #sql3 = "INSERT INTO App_province(date,province_name,add_new,sum_definite,sum_suspected,sum_cure,sum_die) \
-            #            VALUES ('%s','%s' , %s ,  %s,  %s,  %s,'%s')"\
-            #                %(str(tmds),str(province_name),sun_new,sun_sum,\
-            #                    sun_now,sun_cure,sun_death)
-            #cursor.execute(sql3)
-            #conn.commit()
+for contry in datas['areaTree']:
+    if contry['name'] == '中国':
+        for province in contry['children']:
+            sun_new = 0
+            sun_sum = 0
+            sun_cure = 0
+            sun_death = 0
+            sun_now = 0
+            for city in province['children']:
+                province_name = province['name']
+                #with open(ExcelName, 'a', encoding='utf-8', newline='') as csvfile:
+                    #writer = csv.writer(csvfile)
+                    #now = 1
+                    #writer.writerow([province['name'],city['name'], str(city['today']['confirm']),str(city['total']['confirm']),str(city['total']['confirm']-city['total']['dead']-city['total']['heal']),str(city['total']['dead']), str(city['total']['heal']),tmds])
+                sun_new = sun_new + city['today']['confirm']
+                sun_now = sun_now + (city['total']['confirm']-city['total']['dead']-city['total']['heal'])
+                sun_cure = sun_cure + city['total']['heal']
+                sun_death = sun_death + city['total']['dead']
+                sun_sum = sun_sum + city['total']['confirm']
+                #各个省市
+                #sheng.append(province['name'])
+                #city1.append(str(city['name']))
+                #times.append(tmds)
+                #death.append(city['total']['dead'])
+                #new.append(city['today']['confirm'])
+                #now.append(city['total']['confirm']-city['total']['dead']-city['total']['heal'])
+                #cure.append(city['total']['heal'])
+                #summ.append(city['total']['confirm'])
+                #插入province表
+            
+            #插入china表
+            sql3 = "INSERT INTO App_china(date,province_name,add_new,sum_definite,sum_suspected,sum_cure,sum_die) \
+                        VALUES ('%s','%s' , %s ,  %s,  %s,  %s,'%s')"\
+                            %(str(tmds),str(province_name),sun_new,sun_sum,\
+                                sun_now,sun_cure,sun_death)
+            cursor.execute(sql3)
+            conn.commit()
 print("finsh")
 cursor.close()
 conn.close()
