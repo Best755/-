@@ -199,12 +199,13 @@ def china_data_5(request):
 
 def es(request):
     if request.method == "GET":
+        tody = datetime.date.today()
         es = Elasticsearch(hosts="47.96.129.100", port=9200)
-        es.indices.create(index="nice", ignore=400)
-        word_data = word.objects.all()
+        # es.indices.create(index="nice", ignore=400)
+        word_data = china_if.objects.filter(date="2020-07-21")
         for item in word_data:
             data = {}
-            data["name"] = item.word_name
+            data["name"] = "中国"
             data["add_new"] = item.add_new
             data["sum_definite"] = item.sum_definite
             data["sum_suspected"] = item.sum_suspected
@@ -218,7 +219,7 @@ def es(request):
 def es_s(request):
     if request.method == "GET":
         es = Elasticsearch(hosts="47.96.129.100", port=9200)
-        name = request.GET.get("name", "法国")
+        name = request.GET.get("name", "中国")
         query = {
             "query": {
                 "match": {
@@ -226,12 +227,23 @@ def es_s(request):
                 }
             }
         }
-        ret = es.search(index='nice', doc_type='word', body=query, size=5)
+        ret = es.search(index='nice', doc_type='word', body=query, size=300)
         s = ret["hits"]["hits"]
-        l=[]
-        data={}
+        l = []
+        a = []
+        data = {}
         for i in s:
             data_list = i["_source"]
-            l.append(data_list)
-        data["data"] = l
-        return JsonResponse(data=data,json_dumps_params={'ensure_ascii': False})
+            if data_list["date"] == "2020-07-23" and data_list["name"] == "中国":
+                data_list = {}
+                data_list["add_new"] = 0
+                data_list["sum_die"] = 4644
+                data_list["sum_cure"] = 79112
+                data_list["sum_suspected"] = 1521
+                data_list["sum_definite"] = 84332
+                data_list["name"] = "中国"
+                data_list["date"] = "2020-07-23"
+            if data_list["name"] == name:
+                l.append(data_list)
+        data["data"] = l[-5:]
+        return JsonResponse(data=data, json_dumps_params={'ensure_ascii': False})
