@@ -119,7 +119,7 @@
             // },
             xAxis: {
                 type: 'log',
-                boundaryGap: [0, 0.01],
+          boundaryGap: false,
                 splitLine:{
                     show:false
                 },
@@ -139,6 +139,7 @@
             },
             yAxis: {
                 type: 'category',
+
                 data:y_data,
                 axisLabel: {
                     show:true,
@@ -335,16 +336,10 @@
             },
             {
                 "max": 9,
-                "min": 1,
-                "label": "1-9",
+                "min": 0,
+                "label": "0-9",
                 "color": "#F5A9A9"
             },
-            {
-                "max": 0,
-                "min": 0,
-                "label": "0",
-                "color": "#FFFFFF"
-            }
         ]
     }
 };
