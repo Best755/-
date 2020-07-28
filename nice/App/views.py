@@ -11,6 +11,7 @@ from App.models import word, china, china_if
 
 
 def index(request):
+    """美国数据接口"""
     if request.method == "GET":
         sum_data = word.objects.filter(word_name="美国").order_by('-date')
         dist = {}
@@ -32,6 +33,7 @@ def index(request):
 
 def china_data(request):
     if request.method == "GET":
+        """中国个地区数据接口"""
         tody = datetime.date.today()
         sum_data = china.objects.filter(date=tody)
         dist = {}
@@ -51,6 +53,7 @@ def china_data(request):
 
 def word_data(request):
     if request.method == "GET":
+        """世界数据接口"""
         tody = datetime.date.today()
         sum_data = word.objects.filter(date="2020-07-24")
         dist = {}
@@ -76,6 +79,7 @@ def word_data(request):
 
 def word_data_5(request):
     if request.method == "GET":
+        """世界排名前五"""
         tody = datetime.date.today()
         sum_data = word.objects.filter(date="2020-07-24").order_by('-sum_definite')
         dist = {}
@@ -121,6 +125,7 @@ def index_ze(request):
 
 def sum_china_data(request):
     if request.method == "GET":
+        """数据对比接口"""
         sum_data_china = china_if.objects.filter(date="2020-07-25")
         sum_data_english = word.objects.filter(Q(date="2020-07-25") & Q(word_name="英国"))
         sum_data_german = word.objects.filter(Q(date="2020-07-25") & Q(word_name="德国"))
@@ -174,6 +179,7 @@ def sum_china_data(request):
 
 def china_data_5(request):
     if request.method == "GET":
+        """中国排名前五接口"""
         tody = datetime.date.today()
         sum_data = china.objects.filter(date=tody).order_by('-sum_definite')
         dist = {}
@@ -199,10 +205,11 @@ def china_data_5(request):
 
 def es(request):
     if request.method == "GET":
+        """es导入数据"""
         tody = datetime.date.today()
         es = Elasticsearch(hosts="47.96.129.100", port=9200)
         # es.indices.create(index="nice", ignore=400)
-        word_data = china_if.objects.filter(date="2020-07-21")
+        word_data = china_if.objects.filter(date="2020-07-28")
         for item in word_data:
             data = {}
             data["name"] = "中国"
@@ -218,14 +225,22 @@ def es(request):
 
 def es_s(request):
     if request.method == "GET":
+        """es搜索接口"""
         es = Elasticsearch(hosts="47.96.129.100", port=9200)
         name = request.GET.get("name", "中国")
         query = {
             "query": {
                 "match": {
                     "name": name
+                },
+            },
+            "sort": [
+                {
+                    "date": {
+                        "order": "desc"
+                    }
                 }
-            }
+            ]
         }
         ret = es.search(index='nice', doc_type='word', body=query, size=300)
         s = ret["hits"]["hits"]
@@ -245,5 +260,8 @@ def es_s(request):
                 data_list["date"] = "2020-07-23"
             if data_list["name"] == name:
                 l.append(data_list)
-        data["data"] = l[-5:]
+        if name == "中国":
+            data["data"] = l[0:5]
+        else:
+            data["data"] = l[1:6]
         return JsonResponse(data=data, json_dumps_params={'ensure_ascii': False})
